@@ -1,3 +1,10 @@
+# Environment variables
+.env
+.env.*
+
+# Claude Code local settings
+.claude/
+
 # Logs
 logs
 *.log
