@@ -1,0 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 18% 12%;
+    --foreground: 0 0% 100%;
+
+    --card: 240 16% 15%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 240 16% 15%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 41 100% 54%;
+    --primary-foreground: 240 18% 12%;
+
+    --secondary: 240 12% 20%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 11% 18%;
+    --muted-foreground: 240 7% 69%;
+
+    --accent: 41 78% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 10% 24%;
+    --input: 240 10% 24%;
+    --ring: 41 100% 54%;
+
+    --radius: 1.25rem;
+
+    --sidebar-background: 240 18% 12%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 41 100% 54%;
+    --sidebar-primary-foreground: 240 18% 12%;
+    --sidebar-accent: 240 12% 20%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 240 10% 24%;
+    --sidebar-ring: 41 100% 54%;
+
+    --gold-glow: 0 10px 30px hsl(41 100% 54% / 0.16);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  body {
+    background: hsl(240 18% 12%);
+    @apply bg-background font-sans text-foreground antialiased;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  #root {
+    min-height: 100vh;
+    width: 100%;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Sora", sans-serif;
+    letter-spacing: -0.04em;
+  }
+}
+
+@layer utilities {
+  .glow-gold {
+    box-shadow: var(--gold-glow);
+  }
+  .text-glow-gold {
+    text-shadow: none;
+  }
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(41 100% 54%), hsl(41 82% 43%));
+  }
+  .bg-dark-card {
+    background: hsl(240 16% 15%);
+  }
+  .premium-panel {
+    background: hsl(240 16% 15%);
+    border: 1px solid hsl(240 10% 24%);
+    box-shadow: none;
+  }
+  .brand-shell {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
