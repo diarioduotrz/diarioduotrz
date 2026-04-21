@@ -51,7 +51,7 @@ const Horarios = () => {
                   Fale no WhatsApp para garantir sua vaga
                 </p>
                 <a
-                  href={`https://wa.me/${whatsappNumber}?text=Quero%20me%20inscrever%20na%20sala%20das%20${encodeURIComponent(time)}`}
+                  href="https://linktr.ee/trz.diario"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
