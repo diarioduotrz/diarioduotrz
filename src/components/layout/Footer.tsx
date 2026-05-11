@@ -25,8 +25,7 @@ const Footer = () => (
         </div>
 
         <p className="mt-5 text-sm leading-7 text-white/58">
-          Campeonato Free Fire Duo com inscrição diária, ranking por data e premiação de R$ 1,00
-          por kill.
+          Campeonato Free Fire Duo com inscrição diária, ranking por data e premiação de R$0,50 por kill.
         </p>
       </div>
 
@@ -56,7 +55,7 @@ const Footer = () => (
           <div>Modo Duo</div>
           <div>Mapa Bermuda</div>
           <div>Level mínimo 40</div>
-          <div>R$ 1,00 por kill</div>
+          <div>R$0,50 por kill</div>
         </div>
       </div>
 

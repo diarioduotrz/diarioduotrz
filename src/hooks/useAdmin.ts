@@ -94,10 +94,12 @@ export const useAdminStats = (dateFilter?: DateFilter) => {
         { data: torneiosData, error: torneiosError },
         { data: configPremiosData },
         { data: configCustosData },
+        { data: custosManuaisData },
       ] = await Promise.all([
         torneiosQuery,
         supabase.from("configuracoes_globais").select("valor").eq("chave", "premios_padrao").single(),
         supabase.from("configuracoes_globais").select("valor").eq("chave", "config_custos").single(),
+        supabase.from("configuracoes_globais").select("valor").eq("chave", "custos_manuais").single(),
       ]);
 
       if (torneiosError) throw torneiosError;
@@ -116,7 +118,9 @@ export const useAdminStats = (dateFilter?: DateFilter) => {
       const entryFeePadrao = Number(configPremios?.valorInscricao || 0);
       const custoPorSala = Number(configCustos?.custoPorSala ?? 15);
       const custosFixos = Number(configCustos?.custosFixos ?? 0);
+      const dataFimAdmStr = configCustos?.dataFimAdm ?? '2026-04-27';
       const TAXA_ADM_CORTE = new Date('2026-02-22T00:00:00');
+      const TAXA_ADM_FIM = new Date(dataFimAdmStr + 'T23:59:59');
       const TAXA_ADM_ANTIGA = 10;
 
       const equipesPorTorneio: Record<string, number> = {};
@@ -160,13 +164,25 @@ export const useAdminStats = (dateFilter?: DateFilter) => {
       let salasTaxaNova = 0;
       torneiosData?.forEach(t => {
         const dataTorneio = new Date(t.data_torneio);
+        if (dataTorneio > TAXA_ADM_FIM) return;
         const taxa = dataTorneio < TAXA_ADM_CORTE ? TAXA_ADM_ANTIGA : custoPorSala;
         custoAdm += taxa;
         if (dataTorneio < TAXA_ADM_CORTE) salasTaxaAntiga++; else salasTaxaNova++;
       });
 
+      type CustoManual = { id: string; data: string; descricao: string; valor: number };
+      const todosManual: CustoManual[] = Array.isArray(custosManuaisData?.valor)
+        ? (custosManuaisData.valor as CustoManual[])
+        : [];
+      const custosManualList = todosManual.filter(c => {
+        if (from && c.data < from) return false;
+        if (to && c.data > to) return false;
+        return true;
+      });
+      const custosManuais = custosManualList.reduce((sum, c) => sum + Number(c.valor || 0), 0);
+
       const lucro = arrecadacao - totalPremios;
-      const lucroReal = arrecadacao - totalPremios - custoAdm - custosFixos;
+      const lucroReal = arrecadacao - totalPremios - custoAdm - custosFixos - custosManuais;
 
       const diasUnicos = new Set(
         torneiosData?.map(t => t.data_torneio.substring(0, 10)) || []
@@ -201,6 +217,8 @@ export const useAdminStats = (dateFilter?: DateFilter) => {
         lucroMedioPorDia,
         custoAdm,
         custosFixos,
+        custosManuais,
+        custosManualList,
         salasTaxaAntiga,
         salasTaxaNova,
         bestHour: bestHour !== -1 ? `${bestHour}:00` : "N/A"

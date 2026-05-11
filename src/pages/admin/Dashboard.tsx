@@ -166,6 +166,20 @@ const AdminDashboard = () => {
                 <span className="text-muted-foreground">(-) Despesas Fixas</span>
                 <span className="font-bold text-orange-400">{stats ? formatCurrency(stats.custosFixos) : "---"}</span>
               </div>
+              {stats && stats.custosManuais > 0 && (
+                <div className="border-b border-white/5 pb-3 space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">(-) Custos Extras</span>
+                    <span className="font-bold text-orange-400">{formatCurrency(stats.custosManuais)}</span>
+                  </div>
+                  {stats.custosManualList.map((c) => (
+                    <div key={c.id} className="flex justify-between text-xs pl-3">
+                      <span className="text-muted-foreground/70">└ {c.descricao} <span className="opacity-60">[{c.data.split("-").reverse().join("/")}]</span></span>
+                      <span className="text-orange-400/70">{formatCurrency(c.valor)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="pt-4 mt-auto">

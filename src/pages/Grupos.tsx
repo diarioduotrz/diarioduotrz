@@ -1,6 +1,7 @@
 import { Users, ExternalLink, Loader2, Send } from "lucide-react";
+import { useMemo } from "react";
 import SEO from "@/components/SEO";
-import { useGrupos } from "@/hooks/useAdmin";
+import { useGrupos, useConfig } from "@/hooks/useAdmin";
 
 const WhatsAppIcon = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +26,20 @@ const platformIcons: Record<string, React.ReactNode> = {
 
 const Grupos = () => {
   const { data: grupos, isLoading } = useGrupos();
-  const gruposAtivos = grupos?.filter((g) => g.ativo) ?? [];
+  const { data: ordemSalva } = useConfig("grupos_ordem");
+
+  const gruposAtivos = useMemo(() => {
+    const ativos = grupos?.filter((g) => g.ativo) ?? [];
+    if (!ordemSalva || !Array.isArray(ordemSalva)) return ativos;
+    const ordem = ordemSalva as string[];
+    return [...ativos].sort((a, b) => {
+      const ia = ordem.indexOf(a.id);
+      const ib = ordem.indexOf(b.id);
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+  }, [grupos, ordemSalva]);
 
   return (
     <>

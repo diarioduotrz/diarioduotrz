@@ -8,7 +8,7 @@ import { linktreeUrl } from "@/data/championship";
 const navLinks = [
   { to: "/", label: "Home", icon: DoorClosed },
   { to: "/premiacoes", label: "Premiacoes", icon: CircleDollarSign },
-  { to: "/grupos", label: "Grupos Diário Duo FF", icon: Users },
+  { to: "/grupos", label: "Grupos", icon: Users },
   { to: "/regras", label: "Regras", icon: NotepadText },
   { to: "/ranking", label: "Ranking", icon: Trophy },
 ];
@@ -30,7 +30,7 @@ const Navbar = () => {
           </div>
         </Link>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <nav className="flex items-center gap-2">
             {navLinks.map((item) => (
               <Link
@@ -62,7 +62,7 @@ const Navbar = () => {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="rounded-2xl border border-white/8 bg-white/5 p-3 text-white md:hidden"
+          className="rounded-2xl border border-white/8 bg-white/5 p-3 text-white lg:hidden"
           aria-label="Abrir menu"
           aria-expanded={open}
         >
@@ -71,7 +71,7 @@ const Navbar = () => {
       </div>
 
       {open ? (
-        <div className="border-t border-white/8 bg-[rgba(26,26,38,0.98)] px-4 pb-4 pt-3 md:hidden">
+        <div className="border-t border-white/8 bg-[rgba(26,26,38,0.98)] px-4 pb-4 pt-3 lg:hidden">
           <nav className="flex flex-col gap-2">
             {navLinks.map((item) => (
               <Link

@@ -78,11 +78,21 @@ const Home = () => {
 
       const playerKills: Record<string, number> = {};
       results.forEach(res => {
-        if (res.jogadores) {
-          res.jogadores.forEach((player: string) => {
-            playerKills[player] = (playerKills[player] || 0) + (res.kills || 0);
-          });
-        }
+        if (!res.jogadores || res.jogadores.length === 0) return;
+        const temIndividual = res.jogadores.some((j: string) => j.includes("|"));
+        res.jogadores.forEach((entry: string) => {
+          const idx = entry.lastIndexOf("|");
+          if (idx !== -1) {
+            // Kills individuais encodados: "Nome|kills"
+            const nome = entry.substring(0, idx);
+            const kills = Number(entry.substring(idx + 1));
+            playerKills[nome] = (playerKills[nome] || 0) + kills;
+          } else if (!temIndividual) {
+            // Dados antigos: divide o total igualmente entre os jogadores
+            const share = Math.round((res.kills || 0) / res.jogadores.length);
+            playerKills[entry] = (playerKills[entry] || 0) + share;
+          }
+        });
       });
 
       const sorted = Object.entries(playerKills)

@@ -18,6 +18,13 @@ import { useTorneios, useResultados } from "@/hooks/useRanking";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+// Decodifica "Nome|kills" → { nome, kills } ou { nome, kills: null } para nomes sem kills
+const parseJogador = (s: string): { nome: string; kills: number | null } => {
+  const idx = s.lastIndexOf("|");
+  if (idx === -1) return { nome: s, kills: null };
+  return { nome: s.substring(0, idx), kills: Number(s.substring(idx + 1)) };
+};
+
 const titleForDate = (date?: string) =>
   date
     ? `Ranking Campeonato Free Fire Duo | Classificação ${date}`
@@ -260,12 +267,25 @@ const Ranking = () => {
                               </div>
                             </td>
                             <td className="px-6 py-5 font-medium text-white">
-                              {row.jogadores && row.jogadores.length > 0 
-                                ? row.jogadores.join(" & ") 
+                              {row.jogadores && row.jogadores.length > 0
+                                ? row.jogadores.map(j => parseJogador(j).nome).join(" & ")
                                 : row.identificador_equipe}
                             </td>
-                            <td className="px-6 py-5 text-center font-bold text-white/90">
-                              {row.kills}
+                            <td className="px-6 py-5 text-center">
+                              <div className="font-bold text-white/90">{row.kills} kills</div>
+                              {row.jogadores?.some(j => j.includes("|")) && (
+                                <div className="text-[11px] text-white/40 mt-0.5 space-x-1">
+                                  {row.jogadores.map((j, i) => {
+                                    const p = parseJogador(j);
+                                    return (
+                                      <span key={i}>
+                                        {i > 0 && <span className="text-white/20">·</span>}{" "}
+                                        {p.nome}: {p.kills}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </td>
                             <td className="px-6 py-5 text-right font-semibold text-primary">
                               <span className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 border border-primary/20">
@@ -305,8 +325,8 @@ const Ranking = () => {
                           <div className="min-w-0">
                             <div className="text-xs text-white/40 uppercase tracking-wider mb-0.5">Equipe / Jogadores</div>
                             <div className="text-lg font-bold text-white leading-tight">
-                              {row.jogadores && row.jogadores.length > 0 
-                                ? row.jogadores.join(" & ") 
+                              {row.jogadores && row.jogadores.length > 0
+                                ? row.jogadores.map(j => parseJogador(j).nome).join(" & ")
                                 : row.identificador_equipe}
                             </div>
                           </div>
@@ -319,8 +339,16 @@ const Ranking = () => {
                               Abates
                             </div>
                             <div className="text-xl font-bold text-white">
-                              {row.kills} <span className="text-xs text-white/40 font-normal ml-1">Kills</span>
+                              {row.kills} <span className="text-xs text-white/40 font-normal ml-1">kills</span>
                             </div>
+                            {row.jogadores?.some(j => j.includes("|")) && (
+                              <div className="text-[10px] text-white/40 mt-1 space-y-0.5">
+                                {row.jogadores.map((j, i) => {
+                                  const p = parseJogador(j);
+                                  return <div key={i}>{p.nome}: {p.kills}</div>;
+                                })}
+                              </div>
+                            )}
                           </div>
                           
                           <div className="rounded-2xl bg-primary/10 border border-primary/20 p-3">

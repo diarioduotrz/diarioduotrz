@@ -2,6 +2,7 @@ export interface ExtractedResult {
   posicao: number;
   jogadores: string[];  // 1 ou 2 nomes (modo SOLO ou DUO)
   abates: number;
+  killsPorJogador?: { [nome: string]: number };
 }
 
 const MODELOS_PREFERIDOS = [
@@ -49,8 +50,9 @@ const prompt = `
 
   Cada objeto do array deve ter:
   - "posicao": O número da classificação (1, 2, 3...). Se não estiver visível, use a ordem da tabela.
-  - "jogadores": Um array com os nomes dos jogadores da dupla. Se for dupla, inclua os 2 nomes. Se for solo, inclua 1 nome. Não invente nomes ausentes.
-  - "abates": O número TOTAL de abates/kills da dupla. Se a imagem mostrar abates por jogador separadamente, some os dois valores.
+  - "jogadores": Um array com os nomes dos jogadores (apenas nomes, sem números). Se for dupla, inclua os 2 nomes. Se for solo, inclua 1 nome. Não invente nomes ausentes.
+  - "abates": O número TOTAL de abates/kills da dupla (soma de todos os jogadores).
+  - "killsPorJogador": (OPCIONAL) Se a imagem mostrar kills individuais por jogador separadamente, inclua um objeto mapeando nome para kills. Exemplo: {"Alfa": 3, "Beta": 2}. Omita este campo se não conseguir distinguir kills individuais.
 
   Importante:
   - Cada LINHA da tabela representa uma DUPLA (equipe), não um jogador individual.
@@ -121,6 +123,10 @@ export const extrairDadosDaPartida = async (
         ? r.playerNames
         : [String(r.nome ?? r.jogadores ?? "")],
       abates: Number(r.abates ?? r.kills ?? 0),
+      killsPorJogador:
+        r.killsPorJogador && typeof r.killsPorJogador === "object" && !Array.isArray(r.killsPorJogador)
+          ? (r.killsPorJogador as { [nome: string]: number })
+          : undefined,
     })) as ExtractedResult[];
   } catch {
     console.error("Resposta da IA (não parseável):", clean);

@@ -130,10 +130,14 @@ const AdminUploadCentral = () => {
 
       const formattedResults = extractedData.map((r) => {
         const premios = calcularPremioEquipe(r.abates, r.posicao, regrasCalculo);
+        // Encoda kills individuais no array jogadores: "Nome|kills" — sem schema change
+        const jogadoresEncoded = r.killsPorJogador
+          ? r.jogadores.map(nome => `${nome}|${r.killsPorJogador![nome] ?? 0}`)
+          : r.jogadores;
         return {
           torneio_id: torneio.id,
           identificador_equipe: r.jogadores.join(" + "),
-          jogadores: r.jogadores,
+          jogadores: jogadoresEncoded,
           kills: r.abates,
           posicao: r.posicao,
           premio_kill: premios.porKill,
@@ -167,8 +171,12 @@ const AdminUploadCentral = () => {
   const updateRow = (index: number, field: keyof ExtractedResult, value: string | number) => {
     const updated = [...extractedData];
     if (field === "jogadores") {
-      // Converte string "Jogador1 + Jogador2" de volta para array
-      updated[index] = { ...updated[index], jogadores: String(value).split("+").map(s => s.trim()).filter(Boolean) };
+      // Converte string "Jogador1 + Jogador2" de volta para array e reseta kills individuais
+      updated[index] = {
+        ...updated[index],
+        jogadores: String(value).split("+").map(s => s.trim()).filter(Boolean),
+        killsPorJogador: undefined,
+      };
     } else {
       updated[index] = { ...updated[index], [field]: Number(value) };
     }
@@ -435,6 +443,12 @@ const getPosColor = (pos: number) => {
   return "text-white/70";
 };
 
+const parseJogador = (s: string): { nome: string; kills: number | null } => {
+  const idx = s.lastIndexOf("|");
+  if (idx === -1) return { nome: s, kills: null };
+  return { nome: s.substring(0, idx), kills: Number(s.substring(idx + 1)) };
+};
+
 function TorneioModal({ torneio, onClose }: { torneio: Torneio; onClose: () => void }) {
   const { data: resultados, isLoading } = useResultados(torneio.id);
 
@@ -487,9 +501,13 @@ function TorneioModal({ torneio, onClose }: { torneio: Torneio; onClose: () => v
             <div className="space-y-2">
               {resultados?.map((r) => {
                 const pos = r.posicao ?? 0;
-                const nome = r.jogadores && r.jogadores.length > 0
-                  ? r.jogadores.join(" + ")
+                const jogadores = r.jogadores && r.jogadores.length > 0
+                  ? r.jogadores.map(parseJogador)
+                  : null;
+                const nome = jogadores
+                  ? jogadores.map(j => j.nome).join(" + ")
                   : r.identificador_equipe;
+                const temKillsIndividuais = jogadores?.some(j => j.kills !== null);
                 const isPodium = pos <= 3;
                 return (
                   <div
@@ -517,9 +535,18 @@ function TorneioModal({ torneio, onClose }: { torneio: Torneio; onClose: () => v
                     </div>
 
                     {/* Kills */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <Target size={13} className="text-red-400" />
-                      <span className="text-white/80 font-semibold text-sm">{r.kills}</span>
+                    <div className="shrink-0 text-right">
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <Target size={13} className="text-red-400" />
+                        <span className="text-white/80 font-semibold text-sm">{r.kills} kills</span>
+                      </div>
+                      {temKillsIndividuais && jogadores && (
+                        <div className="text-[10px] text-white/40 mt-0.5 space-y-0.5">
+                          {jogadores.map((j, i) => (
+                            <div key={i}>{j.nome}: {j.kills}</div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Prêmio */}
